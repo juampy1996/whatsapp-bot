@@ -1,0 +1,35 @@
+const { Client, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode-terminal');
+
+const client = new Client({
+  authStrategy: new LocalAuth()
+});
+
+client.on('qr', qr => {
+  qrcode.generate(qr, { small: true });
+  console.log('Escanea este código QR con tu WhatsApp');
+});
+
+client.on('ready', () => {
+  console.log('Bot listo y conectado a WhatsApp');
+});
+
+// Aquí pones el nombre exacto del grupo o contacto con el que quieres que responda
+const grupoPermitido = 'Prueba bot';
+
+client.on('message', async (message) => {
+  const chat = await message.getChat();
+
+  // Obtener nombre seguro (grupo o contacto)
+  const contactName = chat.contact && chat.contact.name ? chat.contact.name : chat.name || chat.id.user;
+
+  console.log(`Mensaje de: ${contactName}`);
+  console.log(`Contenido: ${message.body}`);
+
+  // Responder solo si el mensaje es del grupo/contacto permitido
+  if (contactName === grupoPermitido && message.body.toLowerCase().includes('hola')) {
+    client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo o contacto 🤖');
+  }
+});
+
+client.initialize();
