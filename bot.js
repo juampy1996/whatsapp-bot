@@ -3,7 +3,10 @@ const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
 
 const client = new Client({
-  authStrategy: new LocalAuth()
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  }
 });
 
 client.on('qr', qr => {
