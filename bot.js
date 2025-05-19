@@ -1,6 +1,5 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const qrcodeTerminal = require('qrcode-terminal');
-const QRCode = require('qrcode');
+const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
 
 const client = new Client({
@@ -10,27 +9,9 @@ const client = new Client({
   }
 });
 
-client.on('qr', async (qr) => {
-  // Mostrar QR en consola (opcional)
-  qrcodeTerminal.generate(qr, { small: true });
-  console.log('QR recibido, generando imagen y enviando...');
-
-  try {
-    // Guardar QR en archivo PNG
-    await QRCode.toFile('qr.png', qr);
-    console.log('QR guardado en qr.png');
-
-    // Esperar que el cliente esté listo para enviar mensajes
-    client.once('ready', async () => {
-      const media = MessageMedia.fromFilePath('qr.png');
-      const myNumber = '59163771073@c.us'; // Tu número con código país y formato correcto
-      await client.sendMessage(myNumber, media);
-      console.log('QR enviado por WhatsApp a tu número');
-    });
-
-  } catch (error) {
-    console.error('Error guardando o enviando el QR:', error);
-  }
+client.on('qr', qr => {
+  qrcode.generate(qr, { small: true });
+  console.log('Escanea este código QR con tu WhatsApp');
 });
 
 client.on('ready', () => {
