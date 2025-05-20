@@ -10,8 +10,11 @@ const client = new Client({
 });
 
 client.on('qr', qr => {
+  // QR en consola pequeño
   qrcode.generate(qr, { small: true });
   console.log('Escanea este código QR con tu WhatsApp');
+  console.log('Si no puedes escanear el QR en consola, abre este enlace en tu navegador:');
+  console.log(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qr)}&size=200x200`);
 });
 
 client.on('ready', () => {
@@ -28,15 +31,14 @@ client.on('message', async (message) => {
   console.log(`Mensaje de: ${contactName}`);
   console.log(`Contenido: ${message.body}`);
 
-  // Verificar si estamos dentro de la ventana horaria
   const now = new Date();
   const hour = now.getHours();
 
   if (contactName === grupoPermitido && message.body.toLowerCase().includes('hola')) {
-    if (hour >= 15 && hour < 16) {  // Ventana de 15:00 a 16:00
+    if (hour >= 15 && hour < 16) {
       client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo o contacto dentro de la ventana horaria 🤖');
 
-      const media = MessageMedia.fromFilePath('./img.png'); // Cambia la ruta a tu imagen
+      const media = MessageMedia.fromFilePath('./img.png');
       await client.sendMessage(message.from, media);
     } else {
       console.log('Mensaje fuera de ventana horaria, no se responde.');
