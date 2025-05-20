@@ -35,7 +35,7 @@ client.on('message', async (message) => {
   const hour = now.getHours();
 
   if (contactName === grupoPermitido && message.body.toLowerCase().includes('hola')) {
-    if (hour >= 15 && hour < 16) {
+    if (hour >= 22 && hour < 23) {
       client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo o contacto dentro de la ventana horaria 🤖');
 
       const media = MessageMedia.fromFilePath('./img.png');
