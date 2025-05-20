@@ -25,8 +25,12 @@ client.on('message', async (message) => {
 
   const contactName = chat.contact && chat.contact.name ? chat.contact.name : chat.name || chat.id.user;
 
-  console.log(`Mensaje de: ${contactName}`);
-  console.log(`Contenido: ${message.body}`);
+//  console.log(`Mensaje de: ${contactName}`);
+//  console.log(`Contenido: ${message.body}`);
+
+  console.error(`Mensaje de: ${contactName}`);
+  console.error(`Contenido: ${message.body}`);
+    
 
   // Verificar si estamos dentro de la ventana horaria
   const now = new Date();
