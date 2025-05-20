@@ -10,7 +10,6 @@ const client = new Client({
 });
 
 client.on('qr', qr => {
-  // QR en consola pequeño
   qrcode.generate(qr, { small: true });
   console.log('Escanea este código QR con tu WhatsApp');
   console.log('Si no puedes escanear el QR en consola, abre este enlace en tu navegador:');
@@ -21,22 +20,30 @@ client.on('ready', () => {
   console.log('Bot listo y conectado a WhatsApp');
 });
 
-const grupoPermitido = 'Prueba bot';
+const grupoPermitidoID = '120363420630723491@g.us';
 
 client.on('message', async (message) => {
   const chat = await message.getChat();
 
+  // Mostrar todo lo que interactúe con el bot
   const contactName = chat.contact && chat.contact.name ? chat.contact.name : chat.name || chat.id.user;
-
-  console.log(`Mensaje de: ${contactName}`);
+  console.log('--- Nuevo mensaje recibido ---');
+  console.log(`De: ${contactName}`);
+  console.log(`Tipo de chat: ${message.isGroupMsg ? 'Grupo' : 'Individual'}`);
   console.log(`Contenido: ${message.body}`);
+  console.log('------------------------------\n');
 
+  // Lógica para responder solo si es el grupo permitido y dentro de la ventana horaria
   const now = new Date();
   const hour = now.getHours();
 
-  if (contactName === grupoPermitido && message.body.toLowerCase().includes('hola')) {
+  if (
+    message.isGroupMsg &&
+    chat.id._serialized === grupoPermitidoID &&
+    message.body.toLowerCase().includes('hola')
+  ) {
     if (hour >= 22 && hour < 23) {
-      client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo o contacto dentro de la ventana horaria 🤖');
+      client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo dentro de la ventana horaria 🤖');
 
       const media = MessageMedia.fromFilePath('./img.png');
       await client.sendMessage(message.from, media);
