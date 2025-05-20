@@ -1,5 +1,4 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
 const cron = require('node-cron');
 
 const client = new Client({
@@ -10,42 +9,34 @@ const client = new Client({
 });
 
 client.on('qr', qr => {
-  qrcode.generate(qr, { small: true });
-  console.log('Escanea este código QR con tu WhatsApp');
-  console.log('Si no puedes escanear el QR en consola, abre este enlace en tu navegador:');
-  console.log(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qr)}&size=200x200`);
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qr)}&size=200x200`;
+  console.log('Escanea el QR en este enlace desde tu navegador:');
+  console.log(qrUrl);
 });
 
 client.on('ready', () => {
   console.log('Bot listo y conectado a WhatsApp');
 });
 
-const grupoPermitidoID = '120363420630723491@g.us';
+const grupoPermitido = 'Prueba bot';
 
 client.on('message', async (message) => {
   const chat = await message.getChat();
 
-  // Mostrar todo lo que interactúe con el bot
   const contactName = chat.contact && chat.contact.name ? chat.contact.name : chat.name || chat.id.user;
-  console.log('--- Nuevo mensaje recibido ---');
-  console.log(`De: ${contactName}`);
-  console.log(`Tipo de chat: ${message.isGroupMsg ? 'Grupo' : 'Individual'}`);
-  console.log(`Contenido: ${message.body}`);
-  console.log('------------------------------\n');
 
-  // Lógica para responder solo si es el grupo permitido y dentro de la ventana horaria
+  console.log(`Mensaje de: ${contactName}`);
+  console.log(`Contenido: ${message.body}`);
+
+  // Verificar si estamos dentro de la ventana horaria
   const now = new Date();
   const hour = now.getHours();
 
-  if (
-    message.isGroupMsg &&
-    chat.id._serialized === grupoPermitidoID &&
-    message.body.toLowerCase().includes('hola')
-  ) {
-    if (hour >= 22 && hour < 23) {
-      client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo dentro de la ventana horaria 🤖');
+  if (contactName === grupoPermitido && message.body.toLowerCase().includes('hola')) {
+    if (hour >= 15 && hour < 16) {  // Ventana de 15:00 a 16:00
+      client.sendMessage(message.from, '¡Hola! Este es un mensaje automático solo para este grupo o contacto dentro de la ventana horaria 🤖');
 
-      const media = MessageMedia.fromFilePath('./img.png');
+      const media = MessageMedia.fromFilePath('./img.png'); // Cambia la ruta a tu imagen
       await client.sendMessage(message.from, media);
     } else {
       console.log('Mensaje fuera de ventana horaria, no se responde.');
